@@ -1,7 +1,6 @@
 # Reto Empresarial — IPS Sibela (Centro de Medicina Materno Fetal)
 
-Proyecto para el **Concurso Reto Empresarial** de la Universidad Autónoma del Caribe.
-
+Proyecto para el **Concurso Reto Empresarial** 
 **Reto:** optimizar el proceso de agendamiento de citas de la IPS mediante centralización de la información, automatización e inteligencia artificial.
 
 ## Contenido del proyecto
