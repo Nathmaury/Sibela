@@ -247,4 +247,9 @@ Dos escenarios según presupuesto y velocidad de adopción:
 
 ## Anexo: Prototipo funcional
 
-Como evidencia de la viabilidad de la propuesta, el equipo desarrolló un **prototipo funcional navegable** (carpeta `prototipo/` de este proyecto) que demuestra los cuatro módulos centrales: bandeja unificada, agenda centralizada, módulo de leads y dashboard de indicadores, con datos simulados.
+Como evidencia de la viabilidad de la propuesta, el equipo desarrolló un **prototipo funcional navegable** (carpeta `prototipo/` de este proyecto) con dos roles:
+
+- **Rol paciente:** landing page pública de la clínica (`index.html`) con información de servicios y especialistas, y portal de autogestión (`portal.html`) donde el paciente agenda, reagenda o cancela sus citas en línea.
+- **Rol funcionario:** panel administrativo (`admin.html`, con acceso mediante `login.html`) que centraliza la gestión de citas de todos los canales, la bandeja unificada de conversaciones, el seguimiento de leads y el dashboard de indicadores.
+
+Ambos roles comparten la misma fuente de datos: una cita creada por el paciente desde la página aparece de inmediato en el panel administrativo para su confirmación, demostrando el concepto de agenda centralizada como única fuente de verdad.

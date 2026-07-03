@@ -3,504 +3,260 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sibela Conecta — Centro de operaciones de agendamiento</title>
+<title>Centro de Medicina Materno Fetal Sibela — Barranquilla</title>
 <style>
   :root {
-    --bg: #f4f6fb;
-    --surface: #ffffff;
-    --ink: #1b2432;
-    --muted: #64748b;
+    --ink: #2a2038;
+    --muted: #6b6480;
     --brand: #7c3aed;
-    --brand-soft: #ede9fe;
-    --teal: #0d9488;
-    --teal-soft: #ccfbf1;
-    --amber: #d97706;
-    --amber-soft: #fef3c7;
-    --rose: #e11d48;
-    --rose-soft: #ffe4e6;
-    --green: #16a34a;
-    --green-soft: #dcfce7;
-    --blue: #2563eb;
-    --blue-soft: #dbeafe;
-    --border: #e2e8f0;
-    --radius: 14px;
-    --shadow: 0 1px 3px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.05);
+    --brand-dark: #5b21b6;
+    --brand-soft: #f3efff;
+    --pink: #db2777;
+    --pink-soft: #fdf2f8;
+    --cream: #fdfbf7;
+    --border: #ece7f4;
+    --radius: 18px;
+    --shadow: 0 2px 6px rgba(60,30,110,.06), 0 12px 32px rgba(60,30,110,.08);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    min-height: 100vh;
-  }
+  html { scroll-behavior: smooth; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; color: var(--ink); background: var(--cream); line-height: 1.6; }
+  img { max-width: 100%; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 
-  /* ---------- Layout ---------- */
-  .app { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
-  .sidebar {
-    background: #171331;
-    color: #cbd5e1;
-    padding: 24px 16px;
-    display: flex; flex-direction: column; gap: 4px;
+  /* ---------- Header ---------- */
+  header {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(253,251,247,.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
   }
-  .logo { display: flex; align-items: center; gap: 10px; padding: 0 8px 22px; }
+  .nav { display: flex; align-items: center; gap: 28px; padding: 14px 0; }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
   .logo-mark {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: linear-gradient(135deg, #7c3aed, #db2777);
-    display: grid; place-items: center; font-weight: 800; color: #fff; font-size: 17px;
+    width: 40px; height: 40px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--brand), var(--pink));
+    display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 18px;
   }
-  .logo-name { font-weight: 700; color: #fff; font-size: 15px; line-height: 1.15; }
-  .logo-sub { font-size: 10.5px; color: #8b87a8; letter-spacing: .4px; }
-  .nav-btn {
-    display: flex; align-items: center; gap: 10px;
-    background: none; border: none; color: #a5a0c2;
-    font: inherit; font-size: 13.5px; font-weight: 600;
-    padding: 11px 12px; border-radius: 10px; cursor: pointer; text-align: left;
-    transition: background .15s, color .15s;
-  }
-  .nav-btn:hover { background: rgba(255,255,255,.06); color: #fff; }
-  .nav-btn.active { background: var(--brand); color: #fff; }
-  .nav-btn .ico { width: 20px; text-align: center; }
-  .sidebar-foot { margin-top: auto; font-size: 11px; color: #6b6788; padding: 8px; line-height: 1.5; }
-
-  .main { padding: 26px 32px 48px; max-width: 1180px; }
-  .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
-  .page-head h1 { font-size: 21px; }
-  .page-head p { color: var(--muted); font-size: 13px; margin-top: 4px; max-width: 640px; }
-  .badge-demo {
-    background: var(--amber-soft); color: var(--amber);
-    font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 99px; white-space: nowrap;
-  }
-
-  .view { display: none; }
-  .view.active { display: block; animation: fade .18s ease; }
-  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; } }
-
-  /* ---------- Cards / shared ---------- */
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
-  .grid { display: grid; gap: 16px; }
-  .kpis { grid-template-columns: repeat(4, 1fr); margin-bottom: 16px; }
-  .kpi { padding: 16px 18px; }
-  .kpi .lbl { font-size: 12px; color: var(--muted); font-weight: 600; }
-  .kpi .val { font-size: 26px; font-weight: 800; margin-top: 4px; }
-  .kpi .trend { font-size: 11.5px; font-weight: 700; margin-top: 6px; display: inline-block; padding: 3px 8px; border-radius: 99px; }
-  .up { color: var(--green); background: var(--green-soft); }
-  .down { color: var(--rose); background: var(--rose-soft); }
-  .neutral { color: var(--blue); background: var(--blue-soft); }
-
-  .chip { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; display: inline-block; }
-  .chip.wa { background: var(--green-soft); color: var(--green); }
-  .chip.ig { background: var(--rose-soft); color: var(--rose); }
-  .chip.doc { background: var(--blue-soft); color: var(--blue); }
-  .chip.tel { background: var(--amber-soft); color: var(--amber); }
-  .chip.bot { background: var(--brand-soft); color: var(--brand); }
-
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); padding: 12px 16px; border-bottom: 1px solid var(--border); }
-  td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-  tr:last-child td { border-bottom: none; }
-
+  .logo b { font-size: 15px; line-height: 1.1; display: block; }
+  .logo small { font-size: 10px; color: var(--muted); letter-spacing: .6px; }
+  nav.links { display: flex; gap: 22px; margin-left: auto; }
+  nav.links a { text-decoration: none; color: var(--muted); font-size: 13.5px; font-weight: 600; }
+  nav.links a:hover { color: var(--brand); }
   .btn {
-    font: inherit; font-size: 12.5px; font-weight: 700;
-    padding: 8px 14px; border-radius: 9px; cursor: pointer; border: 1px solid var(--border);
-    background: #fff; color: var(--ink); transition: filter .15s;
+    display: inline-block; text-decoration: none; text-align: center; cursor: pointer;
+    font: inherit; font-size: 14px; font-weight: 700; border-radius: 12px;
+    padding: 11px 22px; border: 2px solid transparent; transition: transform .12s, box-shadow .12s;
   }
-  .btn:hover { filter: brightness(.96); }
-  .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
-  .btn.small { padding: 5px 10px; font-size: 11.5px; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(124,58,237,.25); }
+  .btn.primary { background: var(--brand); color: #fff; }
+  .btn.ghost { border-color: var(--brand); color: var(--brand); background: transparent; }
+  .btn.big { padding: 15px 30px; font-size: 15px; }
 
-  /* ---------- Bandeja ---------- */
-  .inbox { display: grid; grid-template-columns: 340px 1fr; min-height: 480px; overflow: hidden; }
-  .threads { border-right: 1px solid var(--border); overflow-y: auto; max-height: 560px; }
-  .thread {
-    padding: 14px 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer;
-    display: flex; flex-direction: column; gap: 5px; transition: background .12s;
+  /* ---------- Hero ---------- */
+  .hero { padding: 72px 0 64px; position: relative; overflow: hidden; }
+  .hero::before {
+    content: ''; position: absolute; right: -140px; top: -140px; width: 480px; height: 480px;
+    background: radial-gradient(circle, rgba(219,39,119,.12), transparent 65%); border-radius: 50%;
   }
-  .thread:hover { background: #f8fafc; }
-  .thread.sel { background: var(--brand-soft); }
-  .thread .row1 { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  .thread .who { font-weight: 700; font-size: 13.5px; }
-  .thread .when { font-size: 11px; color: var(--muted); }
-  .thread .preview { font-size: 12.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .thread .row3 { display: flex; gap: 6px; align-items: center; }
-  .intent { font-size: 10.5px; font-weight: 700; color: var(--brand); background: var(--brand-soft); padding: 2px 8px; border-radius: 99px; }
-
-  .convo { display: flex; flex-direction: column; }
-  .convo-head { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-  .convo-head .who { font-weight: 700; }
-  .convo-head .meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .msgs { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; background: #fafbfe; }
-  .msg { max-width: 72%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.45; }
-  .msg.in { background: #fff; border: 1px solid var(--border); border-bottom-left-radius: 4px; align-self: flex-start; }
-  .msg.out { background: var(--brand); color: #fff; border-bottom-right-radius: 4px; align-self: flex-end; }
-  .msg.bot { background: var(--teal-soft); border: 1px solid #99f6e4; border-bottom-right-radius: 4px; align-self: flex-end; color: #134e4a; }
-  .msg .tag { display: block; font-size: 10px; font-weight: 700; opacity: .75; margin-bottom: 3px; letter-spacing: .3px; }
-  .convo-actions { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; }
-
-  /* ---------- Agenda ---------- */
-  .agenda-toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
-  select {
-    font: inherit; font-size: 13px; padding: 8px 12px; border-radius: 9px;
-    border: 1px solid var(--border); background: #fff; cursor: pointer;
+  .hero::after {
+    content: ''; position: absolute; left: -120px; bottom: -160px; width: 420px; height: 420px;
+    background: radial-gradient(circle, rgba(124,58,237,.12), transparent 65%); border-radius: 50%;
   }
-  .agenda-grid { display: grid; grid-template-columns: 70px repeat(3, 1fr); overflow: hidden; }
-  .agenda-grid .head { background: #f8fafc; padding: 12px; font-size: 12px; font-weight: 700; border-bottom: 1px solid var(--border); border-left: 1px solid var(--border); }
-  .agenda-grid .head:first-child { border-left: none; }
-  .agenda-grid .hour { padding: 10px 12px; font-size: 11px; color: var(--muted); border-top: 1px solid #f1f5f9; }
-  .slot { border-top: 1px solid #f1f5f9; border-left: 1px solid #f1f5f9; padding: 6px; min-height: 52px; }
-  .appt {
-    border-radius: 8px; padding: 6px 9px; font-size: 11.5px; font-weight: 600; line-height: 1.35; cursor: pointer;
+  .hero .wrap { position: relative; z-index: 1; display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; }
+  .kicker {
+    display: inline-block; background: var(--pink-soft); color: var(--pink);
+    font-size: 12px; font-weight: 700; letter-spacing: .5px; padding: 6px 14px; border-radius: 99px; margin-bottom: 18px;
   }
-  .appt.confirmada { background: var(--green-soft); color: #14532d; border-left: 3px solid var(--green); }
-  .appt.solicitada { background: var(--amber-soft); color: #78350f; border-left: 3px solid var(--amber); }
-  .appt.cancelada { background: var(--rose-soft); color: #881337; border-left: 3px solid var(--rose); text-decoration: line-through; }
-  .appt .st { display: block; font-size: 10px; font-weight: 700; opacity: .8; }
-  .libre { font-size: 10.5px; color: #cbd5e1; font-weight: 600; padding: 6px 9px; }
-  .legend { display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: var(--muted); }
-  .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; margin-right: 5px; vertical-align: -1px; }
-
-  /* ---------- Leads ---------- */
-  .funnel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
-  .stage { padding: 16px; text-align: center; position: relative; }
-  .stage .n { font-size: 24px; font-weight: 800; }
-  .stage .t { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 2px; }
-  .stage .pct { font-size: 11px; font-weight: 700; color: var(--brand); margin-top: 6px; }
-  .lead-estado { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
-  .lead-estado.pendiente { background: var(--amber-soft); color: var(--amber); }
-  .lead-estado.contactado { background: var(--blue-soft); color: var(--blue); }
-  .lead-estado.recuperado { background: var(--green-soft); color: var(--green); }
-  .lead-estado.perdido { background: #f1f5f9; color: var(--muted); }
-
-  /* ---------- Dashboard ---------- */
-  .charts { grid-template-columns: 1fr 1fr; }
-  .chart-card { padding: 18px 20px; }
-  .chart-card h3 { font-size: 14px; margin-bottom: 14px; }
-  .bars { display: flex; flex-direction: column; gap: 10px; }
-  .bar-row { display: grid; grid-template-columns: 110px 1fr 42px; align-items: center; gap: 10px; font-size: 12.5px; }
-  .bar-track { background: #f1f5f9; border-radius: 99px; height: 12px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 99px; }
-  .bar-val { font-weight: 700; font-size: 12px; text-align: right; }
-  .cols { display: flex; align-items: flex-end; gap: 12px; height: 150px; padding-top: 8px; }
-  .col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
-  .col .stick { width: 100%; max-width: 42px; border-radius: 8px 8px 3px 3px; background: linear-gradient(180deg, #a78bfa, #7c3aed); }
-  .col .cl { font-size: 10.5px; color: var(--muted); font-weight: 600; }
-  .col .cv { font-size: 11px; font-weight: 700; }
-  .insight {
-    margin-top: 16px; padding: 14px 18px; border-radius: var(--radius);
-    background: var(--brand-soft); border: 1px solid #ddd6fe;
-    font-size: 13px; line-height: 1.55; color: #4c1d95;
+  h1 { font-size: 42px; line-height: 1.15; letter-spacing: -.5px; }
+  h1 em { font-style: normal; color: var(--brand); }
+  .hero p.lead { margin: 18px 0 28px; color: var(--muted); font-size: 17px; max-width: 520px; }
+  .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero-card {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 28px; text-align: center;
   }
-  .insight strong { display: block; margin-bottom: 3px; }
-
-  .toast {
-    position: fixed; bottom: 24px; right: 24px; background: #171331; color: #fff;
-    padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 600;
-    box-shadow: 0 8px 24px rgba(0,0,0,.25); opacity: 0; transform: translateY(8px);
-    transition: opacity .2s, transform .2s; pointer-events: none; z-index: 50;
+  .hero-card .emoji { font-size: 64px; }
+  .hero-card h3 { margin: 12px 0 6px; font-size: 18px; }
+  .hero-card p { color: var(--muted); font-size: 13.5px; }
+  .hero-card .mini {
+    margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
   }
-  .toast.show { opacity: 1; transform: none; }
+  .hero-card .mini div { background: var(--brand-soft); border-radius: 12px; padding: 12px 6px; }
+  .hero-card .mini b { display: block; font-size: 18px; color: var(--brand-dark); }
+  .hero-card .mini span { font-size: 10.5px; color: var(--muted); font-weight: 600; }
 
-  @media (max-width: 900px) {
-    .app { grid-template-columns: 1fr; }
-    .sidebar { flex-direction: row; overflow-x: auto; padding: 12px; }
-    .kpis, .charts, .funnel { grid-template-columns: 1fr 1fr; }
-    .inbox { grid-template-columns: 1fr; }
+  /* ---------- Secciones ---------- */
+  section { padding: 64px 0; }
+  .sec-head { text-align: center; max-width: 620px; margin: 0 auto 40px; }
+  .sec-head h2 { font-size: 30px; letter-spacing: -.3px; }
+  .sec-head p { color: var(--muted); margin-top: 10px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
+  .card {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 26px 22px; box-shadow: var(--shadow); transition: transform .15s;
+  }
+  .card:hover { transform: translateY(-4px); }
+  .card .ico { font-size: 34px; }
+  .card h3 { font-size: 16px; margin: 12px 0 6px; }
+  .card p { font-size: 13px; color: var(--muted); }
+  .card a { display: inline-block; margin-top: 12px; font-size: 13px; font-weight: 700; color: var(--brand); text-decoration: none; }
+
+  /* Especialistas */
+  .medicos { background: #fff; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .doc-card { text-align: center; }
+  .avatar {
+    width: 76px; height: 76px; border-radius: 50%; margin: 0 auto;
+    background: linear-gradient(135deg, var(--brand-soft), var(--pink-soft));
+    display: grid; place-items: center; font-size: 30px;
+    border: 3px solid #fff; box-shadow: 0 0 0 2px var(--border);
+  }
+
+  /* Sede / contacto */
+  .sede-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .sede-card { display: flex; gap: 16px; align-items: flex-start; }
+  .sede-card .ico { font-size: 26px; background: var(--brand-soft); border-radius: 12px; padding: 10px 13px; }
+  .sede-card b { display: block; font-size: 14.5px; }
+  .sede-card span { font-size: 13px; color: var(--muted); }
+
+  /* CTA final */
+  .cta {
+    background: linear-gradient(120deg, var(--brand-dark), var(--brand) 55%, var(--pink));
+    border-radius: 24px; color: #fff; text-align: center; padding: 56px 32px;
+  }
+  .cta h2 { font-size: 30px; }
+  .cta p { opacity: .85; margin: 12px auto 26px; max-width: 480px; }
+  .cta .btn { background: #fff; color: var(--brand-dark); }
+
+  footer { padding: 36px 0 48px; text-align: center; color: var(--muted); font-size: 12.5px; }
+  footer a { color: var(--brand); font-weight: 700; text-decoration: none; }
+  .demo-tag {
+    position: fixed; bottom: 18px; left: 18px; z-index: 50;
+    background: #fef3c7; color: #92400e; font-size: 11px; font-weight: 700;
+    padding: 6px 14px; border-radius: 99px; box-shadow: var(--shadow);
+  }
+
+  @media (max-width: 860px) {
+    .hero .wrap { grid-template-columns: 1fr; }
+    nav.links { display: none; }
+    h1 { font-size: 32px; }
+    .sede-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar">
-    <div class="logo">
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#">
       <div class="logo-mark">S</div>
-      <div>
-        <div class="logo-name">Sibela Conecta</div>
-        <div class="logo-sub">CENTRO DE MEDICINA MATERNO FETAL</div>
+      <div><b>Sibela</b><small>MEDICINA MATERNO FETAL</small></div>
+    </a>
+    <nav class="links">
+      <a href="#servicios">Servicios</a>
+      <a href="#especialistas">Especialistas</a>
+      <a href="#sede">Sede y contacto</a>
+      <a href="login.html">Acceso funcionarios</a>
+    </nav>
+    <a class="btn primary" href="portal.html">Agendar cita</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="kicker">BARRANQUILLA · IPS ESPECIALIZADA</span>
+      <h1>El momento más esperado merece <em>el mejor cuidado</em></h1>
+      <p class="lead">Acompañamos tu embarazo y la salud de tu familia con especialistas en medicina materno fetal, ginecología y pediatría. Agenda, cambia o cancela tus citas en línea, sin filas ni esperas.</p>
+      <div class="hero-actions">
+        <a class="btn primary big" href="portal.html">📅 Agendar mi cita</a>
+        <a class="btn ghost big" href="portal.html#miscitas">Gestionar mis citas</a>
       </div>
     </div>
-    <button class="nav-btn active" data-view="inbox"><span class="ico">&#128172;</span> Bandeja unificada</button>
-    <button class="nav-btn" data-view="agenda"><span class="ico">&#128197;</span> Agenda centralizada</button>
-    <button class="nav-btn" data-view="leads"><span class="ico">&#127919;</span> Leads y conversión</button>
-    <button class="nav-btn" data-view="dash"><span class="ico">&#128200;</span> Indicadores</button>
-    <div class="sidebar-foot">Prototipo — Concurso Reto Empresarial · Universidad Autónoma del Caribe</div>
-  </aside>
+    <div class="hero-card">
+      <div class="emoji">🤰💜</div>
+      <h3>Tu cita en menos de 2 minutos</h3>
+      <p>Elige el servicio, el especialista y el horario que prefieras. Te confirmamos por WhatsApp.</p>
+      <div class="mini">
+        <div><b>5</b><span>Especialidades</span></div>
+        <div><b>24/7</b><span>Agendamiento en línea</span></div>
+        <div><b>+1.500</b><span>Familias atendidas</span></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <main class="main">
+<section id="servicios">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Nuestros servicios</h2>
+      <p>Cuidamos la salud integral de la mujer y su bebé en todas las etapas.</p>
+    </div>
+    <div class="cards" id="servicios-cards"></div>
+  </div>
+</section>
 
-    <!-- ================= BANDEJA ================= -->
-    <section class="view active" id="view-inbox">
-      <div class="page-head">
-        <div>
-          <h1>Bandeja unificada</h1>
-          <p>Todos los canales (WhatsApp, Instagram, Doctoralia y llamadas) en una sola pantalla. La IA clasifica la intención de cada mensaje y el chatbot responde consultas frecuentes 24/7.</p>
-        </div>
-        <span class="badge-demo">DATOS SIMULADOS</span>
-      </div>
-      <div class="card inbox">
-        <div class="threads" id="threads"></div>
-        <div class="convo">
-          <div class="convo-head">
-            <div>
-              <div class="who" id="convo-who">—</div>
-              <div class="meta" id="convo-meta">—</div>
-            </div>
-            <span id="convo-chip"></span>
-          </div>
-          <div class="msgs" id="msgs"></div>
-          <div class="convo-actions">
-            <button class="btn primary" onclick="toast('Cita creada en la agenda centralizada y confirmación enviada por WhatsApp')">&#128197; Agendar cita</button>
-            <button class="btn" onclick="toast('Contacto registrado en el módulo de leads para seguimiento en 48 h')">&#127919; Registrar como lead</button>
-            <button class="btn" onclick="toast('Conversación transferida a un asesor humano')">&#128100; Pasar a humano</button>
-          </div>
-        </div>
-      </div>
-    </section>
+<section id="especialistas" class="medicos">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Directorio de especialistas</h2>
+      <p>Conoce al equipo que te va a acompañar.</p>
+    </div>
+    <div class="cards" id="medicos-cards"></div>
+  </div>
+</section>
 
-    <!-- ================= AGENDA ================= -->
-    <section class="view" id="view-agenda">
-      <div class="page-head">
-        <div>
-          <h1>Agenda centralizada</h1>
-          <p>Única fuente de verdad para todas las agendas médicas. Las citas creadas desde cualquier canal aparecen aquí, con confirmaciones y recordatorios automáticos.</p>
-        </div>
-        <span class="badge-demo">DATOS SIMULADOS</span>
-      </div>
-      <div class="agenda-toolbar">
-        <select><option>Miércoles 2 de julio</option><option>Jueves 3 de julio</option><option>Viernes 4 de julio</option></select>
-        <button class="btn primary" onclick="toast('Recordatorios de 24 h enviados automáticamente a 9 pacientes')">&#128276; Enviar recordatorios del día</button>
-        <button class="btn" onclick="toast('Agenda sincronizada con Doctoralia')">&#8635; Sincronizar Doctoralia</button>
-      </div>
-      <div class="card agenda-grid" id="agenda"></div>
-      <div class="legend">
-        <span><span class="dot" style="background:var(--green)"></span>Confirmada</span>
-        <span><span class="dot" style="background:var(--amber)"></span>Solicitada (pendiente de confirmar)</span>
-        <span><span class="dot" style="background:var(--rose)"></span>Cancelada — cupo liberado para lista de espera</span>
-      </div>
-    </section>
+<section id="sede">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Sede y contacto</h2>
+      <p>Agendamiento de citas, resultados y atención general.</p>
+    </div>
+    <div class="sede-grid">
+      <div class="card sede-card"><div class="ico">📍</div><div><b>Nuestra sede</b><span>Cll. 85 # 50 – 159 · Barranquilla, Atlántico</span></div></div>
+      <div class="card sede-card"><div class="ico">💬</div><div><b>WhatsApp</b><span>302 593 6555 — respuesta inmediata con asistente virtual</span></div></div>
+      <div class="card sede-card"><div class="ico">📞</div><div><b>Teléfono</b><span>300 406 3641 · Lunes a viernes 7 am – 5 pm</span></div></div>
+      <div class="card sede-card"><div class="ico">✉️</div><div><b>Correo</b><span>centrodemedicinasibela@gmail.com</span></div></div>
+    </div>
+  </div>
+</section>
 
-    <!-- ================= LEADS ================= -->
-    <section class="view" id="view-leads">
-      <div class="page-head">
-        <div>
-          <h1>Leads y conversión</h1>
-          <p>Personas que pidieron información pero no agendaron. El sistema registra el motivo de abandono y programa el recontacto automático para recuperarlas.</p>
-        </div>
-        <span class="badge-demo">DATOS SIMULADOS</span>
-      </div>
-      <div class="funnel">
-        <div class="card stage"><div class="n">312</div><div class="t">Contactos del mes</div><div class="pct">100 %</div></div>
-        <div class="card stage"><div class="n">247</div><div class="t">Interesados</div><div class="pct">79 %</div></div>
-        <div class="card stage"><div class="n">176</div><div class="t">Agendaron</div><div class="pct">56 %</div></div>
-        <div class="card stage"><div class="n">158</div><div class="t">Atendidos</div><div class="pct">51 %</div></div>
-      </div>
-      <div class="card">
-        <table>
-          <thead><tr><th>Persona</th><th>Canal</th><th>Servicio de interés</th><th>Motivo de abandono</th><th>Estado</th><th></th></tr></thead>
-          <tbody id="leads-body"></tbody>
-        </table>
-      </div>
-      <div class="insight">
-        <strong>&#128161; Hallazgo del análisis de abandono</strong>
-        El 38 % de los leads perdidos abandona por demora en la autorización de su EPS y el 27 % por no encontrar horario en la franja de la tarde. Recomendación: habilitar franja de 4–6 pm los martes y jueves, y crear guía automatizada del trámite de autorización.
-      </div>
-    </section>
+<section>
+  <div class="wrap">
+    <div class="cta">
+      <h2>¿Lista para tu próxima cita?</h2>
+      <p>Agenda en línea y recibe la confirmación y los recordatorios directamente en tu WhatsApp.</p>
+      <a class="btn big" href="portal.html">Agendar ahora</a>
+    </div>
+  </div>
+</section>
 
-    <!-- ================= DASHBOARD ================= -->
-    <section class="view" id="view-dash">
-      <div class="page-head">
-        <div>
-          <h1>Indicadores para la toma de decisiones</h1>
-          <p>KPIs en tiempo real del proceso de agendamiento: ocupación, cancelaciones, ausentismo, conversión y tiempos de respuesta por canal.</p>
-        </div>
-        <span class="badge-demo">DATOS SIMULADOS</span>
-      </div>
-      <div class="grid kpis">
-        <div class="card kpi"><div class="lbl">Ocupación de agendas</div><div class="val">82 %</div><span class="trend up">▲ +14 pts vs. mes anterior</span></div>
-        <div class="card kpi"><div class="lbl">Tiempo medio de respuesta</div><div class="val">4 min</div><span class="trend up">▼ antes: 3,2 horas</span></div>
-        <div class="card kpi"><div class="lbl">Ausentismo (no-show)</div><div class="val">7 %</div><span class="trend up">▼ antes: 15 %</span></div>
-        <div class="card kpi"><div class="lbl">Conversión de leads</div><div class="val">56 %</div><span class="trend up">▲ +19 pts con recontacto</span></div>
-      </div>
-      <div class="grid charts">
-        <div class="card chart-card">
-          <h3>Citas por canal de origen (este mes)</h3>
-          <div class="bars">
-            <div class="bar-row"><span>WhatsApp</span><div class="bar-track"><div class="bar-fill" style="width:78%;background:var(--green)"></div></div><span class="bar-val">142</span></div>
-            <div class="bar-row"><span>Chatbot IA</span><div class="bar-track"><div class="bar-fill" style="width:52%;background:var(--brand)"></div></div><span class="bar-val">95</span></div>
-            <div class="bar-row"><span>Doctoralia</span><div class="bar-track"><div class="bar-fill" style="width:38%;background:var(--blue)"></div></div><span class="bar-val">69</span></div>
-            <div class="bar-row"><span>Llamadas</span><div class="bar-track"><div class="bar-fill" style="width:26%;background:var(--amber)"></div></div><span class="bar-val">47</span></div>
-            <div class="bar-row"><span>Instagram</span><div class="bar-track"><div class="bar-fill" style="width:17%;background:var(--rose)"></div></div><span class="bar-val">31</span></div>
-          </div>
-        </div>
-        <div class="card chart-card">
-          <h3>Ocupación semanal por especialidad (%)</h3>
-          <div class="cols">
-            <div class="col"><span class="cv">91</span><div class="stick" style="height:91%"></div><span class="cl">Ginecología</span></div>
-            <div class="col"><span class="cv">86</span><div class="stick" style="height:86%"></div><span class="cl">Perinatología</span></div>
-            <div class="col"><span class="cv">74</span><div class="stick" style="height:74%"></div><span class="cl">Pediatría</span></div>
-            <div class="col"><span class="cv">68</span><div class="stick" style="height:68%"></div><span class="cl">Ecografías</span></div>
-            <div class="col"><span class="cv">55</span><div class="stick" style="height:55%"></div><span class="cl">Nutrición</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="insight">
-        <strong>&#129302; Recomendación de la analítica predictiva</strong>
-        Los lunes entre 8 y 10 am concentran el 34 % del ausentismo. El modelo sugiere confirmación proactiva por WhatsApp el domingo y sobre-agenda controlada de 1 cupo por franja. Nutrición tiene 45 % de capacidad ociosa: oportunidad de promoción cruzada con los controles prenatales.
-      </div>
-    </section>
+<footer>
+  <div class="wrap">
+    Centro de Medicina Materno Fetal Sibela · Barranquilla · NIT 901790693<br>
+    ¿Eres parte del equipo? <a href="login.html">Ingresa al panel administrativo</a>
+  </div>
+</footer>
 
-  </main>
-</div>
-<div class="toast" id="toast"></div>
+<span class="demo-tag">PROTOTIPO — datos simulados</span>
 
+<script src="assets/store.js"></script>
 <script>
-/* ---------- Navegación ---------- */
-const views = document.querySelectorAll('.view');
-document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    views.forEach(v => v.classList.remove('active'));
-    document.getElementById('view-' + btn.dataset.view).classList.add('active');
-  });
-});
+  document.getElementById('servicios-cards').innerHTML = SIBELA.SERVICIOS.map(s => `
+    <div class="card">
+      <div class="ico">${s.icono}</div>
+      <h3>${s.nombre}</h3>
+      <p>${s.desc}</p>
+      <a href="portal.html?servicio=${s.id}">Agendar →</a>
+    </div>`).join('');
 
-function toast(text) {
-  const t = document.getElementById('toast');
-  t.textContent = text;
-  t.classList.add('show');
-  clearTimeout(t._h);
-  t._h = setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-/* ---------- Datos simulados: bandeja ---------- */
-const CH = {
-  wa:  { label: 'WhatsApp',   cls: 'wa'  },
-  ig:  { label: 'Instagram',  cls: 'ig'  },
-  doc: { label: 'Doctoralia', cls: 'doc' },
-  tel: { label: 'Llamada',    cls: 'tel' },
-};
-const conversations = [
-  {
-    who: 'María Fernanda Torres', ch: 'wa', when: '10:42', intent: 'Agendar cita',
-    preview: 'Buenos días, ¿tienen disponibilidad con la perinatóloga esta semana?',
-    meta: 'Paciente registrada · Último control: 12 jun · Semana 28 de gestación',
-    msgs: [
-      { t: 'in',  who: 'Paciente', text: 'Buenos días, ¿tienen disponibilidad con la perinatóloga esta semana?' },
-      { t: 'bot', who: 'Chatbot IA', text: '¡Hola, María Fernanda! 😊 La Dra. Herrera tiene disponibilidad el miércoles a las 9:00 am y el viernes a las 10:30 am. ¿Cuál prefieres?' },
-      { t: 'in',  who: 'Paciente', text: 'El miércoles a las 9 me sirve perfecto' },
-      { t: 'bot', who: 'Chatbot IA', text: '¡Listo! Tu cita quedó agendada: miércoles 2 de julio, 9:00 am, Dra. Herrera (Perinatología). Te enviaré un recordatorio 24 horas antes. 📅' },
-    ],
-  },
-  {
-    who: 'Carolina Pérez', ch: 'ig', when: '10:15', intent: 'Pide información',
-    preview: '¿Cuánto cuesta la ecografía 4D? ¿Atienden con Sura?',
-    meta: 'Contacto nuevo · Sin historial · Origen: publicación de Instagram',
-    msgs: [
-      { t: 'in',  who: 'Interesada', text: '¿Cuánto cuesta la ecografía 4D? ¿Atienden con Sura?' },
-      { t: 'bot', who: 'Chatbot IA', text: '¡Hola! 💜 La ecografía 4D tiene un valor de $250.000 particular. Sí atendemos con Sura: necesitas la orden médica y la autorización de tu EPS. ¿Quieres que te guíe con el paso a paso de la autorización?' },
-      { t: 'in',  who: 'Interesada', text: 'Uy, déjame averiguar lo de la autorización y te escribo' },
-      { t: 'bot', who: 'Chatbot IA', text: '¡Claro que sí! Te guardo la información. Si no me escribes, te contacto en un par de días por si necesitas ayuda con el trámite. 🤗' },
-    ],
-  },
-  {
-    who: 'Laura Jiménez', ch: 'doc', when: '9:58', intent: 'Reprogramar',
-    preview: 'Necesito mover mi cita del jueves, me salió un viaje de trabajo…',
-    meta: 'Paciente registrada · Cita actual: jue 3 jul, 11:00 am · Ginecología',
-    msgs: [
-      { t: 'in',  who: 'Paciente', text: 'Necesito mover mi cita del jueves, me salió un viaje de trabajo. ¿Qué opciones hay la otra semana?' },
-      { t: 'out', who: 'Recepción', text: 'Hola Laura, con gusto. La Dra. Acosta tiene disponible el martes 8 a las 2:30 pm o el miércoles 9 a las 8:00 am. El cupo del jueves quedará libre para otra paciente en lista de espera.' },
-      { t: 'in',  who: 'Paciente', text: 'El martes a las 2:30 está perfecto, gracias!' },
-    ],
-  },
-  {
-    who: 'Andrea Salcedo', ch: 'tel', when: '9:30', intent: 'Pide información',
-    preview: 'Llamada registrada: preguntó por control prenatal, quedó de volver a llamar',
-    meta: 'Contacto nuevo · Llamada de 3 min registrada por recepción',
-    msgs: [
-      { t: 'out', who: 'Recepción (nota de llamada)', text: 'Preguntó por el control prenatal y los precios del paquete. Está en semana 9. Quedó de consultar con su esposo y volver a llamar. Registrada como lead con recontacto en 48 h.' },
-    ],
-  },
-  {
-    who: 'Paola Martínez', ch: 'wa', when: 'Ayer', intent: 'Cancelar',
-    preview: 'Hola, debo cancelar mi cita de mañana, ¿la puedo dejar para otro día?',
-    meta: 'Paciente registrada · Cita: mié 2 jul, 10:00 am · Pediatría',
-    msgs: [
-      { t: 'in',  who: 'Paciente', text: 'Hola, debo cancelar mi cita de mañana, ¿la puedo dejar para otro día?' },
-      { t: 'bot', who: 'Chatbot IA', text: 'Hola Paola, lamento el inconveniente. Tu cita del miércoles queda cancelada y el cupo se liberó. El Dr. Ruiz tiene disponibilidad el viernes 4 a las 10:00 am, ¿te la reservo?' },
-      { t: 'in',  who: 'Paciente', text: 'Sí por favor 🙏' },
-      { t: 'bot', who: 'Chatbot IA', text: '¡Reservada! Viernes 4 de julio, 10:00 am con el Dr. Ruiz (Pediatría). El cupo del miércoles ya fue ofrecido a la lista de espera. ✅' },
-    ],
-  },
-];
-
-const threadsEl = document.getElementById('threads');
-conversations.forEach((c, i) => {
-  const d = document.createElement('div');
-  d.className = 'thread' + (i === 0 ? ' sel' : '');
-  d.innerHTML = `
-    <div class="row1"><span class="who">${c.who}</span><span class="when">${c.when}</span></div>
-    <div class="preview">${c.preview}</div>
-    <div class="row3"><span class="chip ${CH[c.ch].cls}">${CH[c.ch].label}</span><span class="intent">IA: ${c.intent}</span></div>`;
-  d.addEventListener('click', () => selectThread(i));
-  threadsEl.appendChild(d);
-});
-
-function selectThread(i) {
-  document.querySelectorAll('.thread').forEach((t, j) => t.classList.toggle('sel', j === i));
-  const c = conversations[i];
-  document.getElementById('convo-who').textContent = c.who;
-  document.getElementById('convo-meta').textContent = c.meta;
-  document.getElementById('convo-chip').innerHTML = `<span class="chip ${CH[c.ch].cls}">${CH[c.ch].label}</span>`;
-  const box = document.getElementById('msgs');
-  box.innerHTML = '';
-  c.msgs.forEach(m => {
-    const el = document.createElement('div');
-    el.className = 'msg ' + m.t;
-    el.innerHTML = `<span class="tag">${m.who}</span>${m.text}`;
-    box.appendChild(el);
-  });
-}
-selectThread(0);
-
-/* ---------- Datos simulados: agenda ---------- */
-const doctors = ['Dra. Herrera · Perinatología', 'Dra. Acosta · Ginecología', 'Dr. Ruiz · Pediatría'];
-const hours = ['8:00', '9:00', '10:00', '11:00', '2:00 pm', '3:00 pm'];
-const appts = {
-  '8:00':   [ {p:'Valentina Ríos', s:'confirmada', o:'WhatsApp'}, {p:'Diana Castro', s:'confirmada', o:'Doctoralia'}, null ],
-  '9:00':   [ {p:'María F. Torres', s:'confirmada', o:'Chatbot IA'}, {p:'Sandra Meza', s:'solicitada', o:'Instagram'}, {p:'Bebé Rodríguez', s:'confirmada', o:'Llamada'} ],
-  '10:00':  [ {p:'Ana Lucía Gómez', s:'confirmada', o:'WhatsApp'}, null, {p:'Paola Martínez', s:'cancelada', o:'WhatsApp'} ],
-  '11:00':  [ {p:'Marcela Duarte', s:'solicitada', o:'Doctoralia'}, {p:'Laura Jiménez', s:'confirmada', o:'Doctoralia'}, {p:'Bebé Vargas', s:'confirmada', o:'WhatsApp'} ],
-  '2:00 pm':[ null, {p:'Katherine Solano', s:'confirmada', o:'Chatbot IA'}, {p:'Bebé Pineda', s:'solicitada', o:'Llamada'} ],
-  '3:00 pm':[ {p:'Julieth Navarro', s:'confirmada', o:'WhatsApp'}, {p:'Carmen Oviedo', s:'confirmada', o:'Instagram'}, null ],
-};
-const ag = document.getElementById('agenda');
-ag.innerHTML = '<div class="head"></div>' + doctors.map(d => `<div class="head">${d}</div>`).join('');
-hours.forEach(h => {
-  ag.innerHTML += `<div class="hour">${h}</div>` + appts[h].map(a => {
-    if (!a) return '<div class="slot"><div class="libre">Disponible</div></div>';
-    const st = a.s.charAt(0).toUpperCase() + a.s.slice(1);
-    return `<div class="slot"><div class="appt ${a.s}" onclick="toast('Cita de ${a.p} — origen: ${a.o}. Estado: ${st}.')">${a.p}<span class="st">${st} · vía ${a.o}</span></div></div>`;
-  }).join('');
-});
-
-/* ---------- Datos simulados: leads ---------- */
-const leads = [
-  { who: 'Carolina Pérez', ch: 'ig', srv: 'Ecografía 4D', why: 'Trámite de autorización EPS', st: 'pendiente' },
-  { who: 'Andrea Salcedo', ch: 'tel', srv: 'Control prenatal', why: 'Consultará con su familia', st: 'pendiente' },
-  { who: 'Yulieth Camargo', ch: 'wa', srv: 'Perinatología', why: 'Sin horario en la tarde', st: 'contactado' },
-  { who: 'Melissa Ortega', ch: 'wa', srv: 'Ginecología', why: 'Preguntó precio y no respondió', st: 'recuperado' },
-  { who: 'Tatiana Beltrán', ch: 'doc', srv: 'Pediatría', why: 'Eligió otra IPS más cercana', st: 'perdido' },
-  { who: 'Karen Sofía Díaz', ch: 'ig', srv: 'Ecografía de detalle', why: 'Trámite de autorización EPS', st: 'contactado' },
-];
-const stLabel = { pendiente: 'Recontacto en 48 h', contactado: 'Recontactada', recuperado: 'Recuperada ✓', perdido: 'No interesada' };
-document.getElementById('leads-body').innerHTML = leads.map(l => `
-  <tr>
-    <td style="font-weight:600">${l.who}</td>
-    <td><span class="chip ${CH[l.ch].cls}">${CH[l.ch].label}</span></td>
-    <td>${l.srv}</td>
-    <td style="color:var(--muted)">${l.why}</td>
-    <td><span class="lead-estado ${l.st}">${stLabel[l.st]}</span></td>
-    <td><button class="btn small" onclick="toast('Mensaje de seguimiento personalizado enviado a ${l.who}')">Recontactar</button></td>
-  </tr>`).join('');
+  document.getElementById('medicos-cards').innerHTML = SIBELA.MEDICOS.map(m => `
+    <div class="card doc-card">
+      <div class="avatar">${SIBELA.servicioDe(m.servicio).icono}</div>
+      <h3>${m.nombre}</h3>
+      <p>${m.titulo}</p>
+      <a href="portal.html?servicio=${m.servicio}">Agendar con ${m.nombre.split(' ')[0]} →</a>
+    </div>`).join('');
 </script>
 </body>
 </html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel administrativo — Sibela Conecta</title>
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --ink: #1b2432;
+    --muted: #64748b;
+    --brand: #7c3aed;
+    --brand-soft: #ede9fe;
+    --teal: #0d9488;
+    --teal-soft: #ccfbf1;
+    --amber: #d97706;
+    --amber-soft: #fef3c7;
+    --rose: #e11d48;
+    --rose-soft: #ffe4e6;
+    --green: #16a34a;
+    --green-soft: #dcfce7;
+    --blue: #2563eb;
+    --blue-soft: #dbeafe;
+    --border: #e2e8f0;
+    --radius: 14px;
+    --shadow: 0 1px 3px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.05);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ---------- Layout ---------- */
+  .app { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+  .sidebar {
+    background: #171331;
+    color: #cbd5e1;
+    padding: 24px 16px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; padding: 0 8px 22px; }
+  .logo-mark {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #7c3aed, #db2777);
+    display: grid; place-items: center; font-weight: 800; color: #fff; font-size: 17px;
+  }
+  .logo-name { font-weight: 700; color: #fff; font-size: 15px; line-height: 1.15; }
+  .logo-sub { font-size: 10.5px; color: #8b87a8; letter-spacing: .4px; }
+  .nav-btn {
+    display: flex; align-items: center; gap: 10px;
+    background: none; border: none; color: #a5a0c2;
+    font: inherit; font-size: 13.5px; font-weight: 600;
+    padding: 11px 12px; border-radius: 10px; cursor: pointer; text-align: left;
+    transition: background .15s, color .15s;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,.06); color: #fff; }
+  .nav-btn.active { background: var(--brand); color: #fff; }
+  .nav-btn .ico { width: 20px; text-align: center; }
+  .sidebar-foot { margin-top: auto; font-size: 11px; color: #6b6788; padding: 8px; line-height: 1.5; }
+  .sidebar-user {
+    background: rgba(255,255,255,.06); border-radius: 12px; padding: 12px; margin-top: 14px;
+    font-size: 12px; color: #cbd5e1; line-height: 1.5;
+  }
+  .sidebar-user a { color: #f9a8d4; font-weight: 700; text-decoration: none; }
+
+  .main { padding: 26px 32px 48px; max-width: 1180px; }
+  .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+  .page-head h1 { font-size: 21px; }
+  .page-head p { color: var(--muted); font-size: 13px; margin-top: 4px; max-width: 640px; }
+  .badge-demo {
+    background: var(--amber-soft); color: var(--amber);
+    font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 99px; white-space: nowrap;
+  }
+
+  .view { display: none; }
+  .view.active { display: block; animation: fade .18s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; } }
+
+  /* ---------- Cards / shared ---------- */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .grid { display: grid; gap: 16px; }
+  .kpis { grid-template-columns: repeat(4, 1fr); margin-bottom: 16px; }
+  .kpi { padding: 16px 18px; }
+  .kpi .lbl { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .kpi .val { font-size: 26px; font-weight: 800; margin-top: 4px; }
+  .kpi .trend { font-size: 11.5px; font-weight: 700; margin-top: 6px; display: inline-block; padding: 3px 8px; border-radius: 99px; }
+  .up { color: var(--green); background: var(--green-soft); }
+  .down { color: var(--rose); background: var(--rose-soft); }
+  .neutral { color: var(--blue); background: var(--blue-soft); }
+
+  .chip { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; display: inline-block; }
+  .chip.wa { background: var(--green-soft); color: var(--green); }
+  .chip.ig { background: var(--rose-soft); color: var(--rose); }
+  .chip.doc { background: var(--blue-soft); color: var(--blue); }
+  .chip.tel { background: var(--amber-soft); color: var(--amber); }
+  .chip.bot { background: var(--brand-soft); color: var(--brand); }
+  .chip.web { background: var(--teal-soft); color: var(--teal); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+
+  .btn {
+    font: inherit; font-size: 12.5px; font-weight: 700;
+    padding: 8px 14px; border-radius: 9px; cursor: pointer; border: 1px solid var(--border);
+    background: #fff; color: var(--ink); transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(.96); }
+  .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .btn.small { padding: 5px 10px; font-size: 11.5px; }
+  .btn.danger { color: var(--rose); border-color: #fecdd3; }
+
+  .estado { font-size: 11px; font-weight: 700; padding: 4px 11px; border-radius: 99px; }
+  .estado.confirmada { background: var(--green-soft); color: var(--green); }
+  .estado.solicitada { background: var(--amber-soft); color: var(--amber); }
+  .estado.cancelada { background: var(--rose-soft); color: var(--rose); }
+  .estado.atendida { background: var(--blue-soft); color: var(--blue); }
+
+  /* ---------- Bandeja ---------- */
+  .inbox { display: grid; grid-template-columns: 340px 1fr; min-height: 480px; overflow: hidden; }
+  .threads { border-right: 1px solid var(--border); overflow-y: auto; max-height: 560px; }
+  .thread {
+    padding: 14px 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer;
+    display: flex; flex-direction: column; gap: 5px; transition: background .12s;
+  }
+  .thread:hover { background: #f8fafc; }
+  .thread.sel { background: var(--brand-soft); }
+  .thread .row1 { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .thread .who { font-weight: 700; font-size: 13.5px; }
+  .thread .when { font-size: 11px; color: var(--muted); }
+  .thread .preview { font-size: 12.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .thread .row3 { display: flex; gap: 6px; align-items: center; }
+  .intent { font-size: 10.5px; font-weight: 700; color: var(--brand); background: var(--brand-soft); padding: 2px 8px; border-radius: 99px; }
+
+  .convo { display: flex; flex-direction: column; }
+  .convo-head { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .convo-head .who { font-weight: 700; }
+  .convo-head .meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .msgs { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; background: #fafbfe; }
+  .msg { max-width: 72%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.45; }
+  .msg.in { background: #fff; border: 1px solid var(--border); border-bottom-left-radius: 4px; align-self: flex-start; }
+  .msg.out { background: var(--brand); color: #fff; border-bottom-right-radius: 4px; align-self: flex-end; }
+  .msg.bot { background: var(--teal-soft); border: 1px solid #99f6e4; border-bottom-right-radius: 4px; align-self: flex-end; color: #134e4a; }
+  .msg .tag { display: block; font-size: 10px; font-weight: 700; opacity: .75; margin-bottom: 3px; letter-spacing: .3px; }
+  .convo-actions { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* ---------- Agenda ---------- */
+  .agenda-toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+  select {
+    font: inherit; font-size: 13px; padding: 8px 12px; border-radius: 9px;
+    border: 1px solid var(--border); background: #fff; cursor: pointer;
+  }
+  .fecha-group { background: #f8fafc; padding: 10px 16px; font-size: 12px; font-weight: 700; color: var(--muted); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: .5px; }
+
+  /* ---------- Leads ---------- */
+  .funnel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .stage { padding: 16px; text-align: center; position: relative; }
+  .stage .n { font-size: 24px; font-weight: 800; }
+  .stage .t { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+  .stage .pct { font-size: 11px; font-weight: 700; color: var(--brand); margin-top: 6px; }
+  .lead-estado { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+  .lead-estado.pendiente { background: var(--amber-soft); color: var(--amber); }
+  .lead-estado.contactado { background: var(--blue-soft); color: var(--blue); }
+  .lead-estado.recuperado { background: var(--green-soft); color: var(--green); }
+  .lead-estado.perdido { background: #f1f5f9; color: var(--muted); }
+
+  /* ---------- Dashboard ---------- */
+  .charts { grid-template-columns: 1fr 1fr; }
+  .chart-card { padding: 18px 20px; }
+  .chart-card h3 { font-size: 14px; margin-bottom: 14px; }
+  .bars { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: 110px 1fr 42px; align-items: center; gap: 10px; font-size: 12.5px; }
+  .bar-track { background: #f1f5f9; border-radius: 99px; height: 12px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 99px; }
+  .bar-val { font-weight: 700; font-size: 12px; text-align: right; }
+  .cols { display: flex; align-items: flex-end; gap: 12px; height: 150px; padding-top: 8px; }
+  .col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+  .col .stick { width: 100%; max-width: 42px; border-radius: 8px 8px 3px 3px; background: linear-gradient(180deg, #a78bfa, #7c3aed); }
+  .col .cl { font-size: 10.5px; color: var(--muted); font-weight: 600; }
+  .col .cv { font-size: 11px; font-weight: 700; }
+  .insight {
+    margin-top: 16px; padding: 14px 18px; border-radius: var(--radius);
+    background: var(--brand-soft); border: 1px solid #ddd6fe;
+    font-size: 13px; line-height: 1.55; color: #4c1d95;
+  }
+  .insight strong { display: block; margin-bottom: 3px; }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; background: #171331; color: #fff;
+    padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0,0,0,.25); opacity: 0; transform: translateY(8px);
+    transition: opacity .2s, transform .2s; pointer-events: none; z-index: 50;
+  }
+  .toast.show { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { flex-direction: row; overflow-x: auto; padding: 12px; }
+    .kpis, .charts, .funnel { grid-template-columns: 1fr 1fr; }
+    .inbox { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">S</div>
+      <div>
+        <div class="logo-name">Sibela Conecta</div>
+        <div class="logo-sub">PANEL ADMINISTRATIVO</div>
+      </div>
+    </div>
+    <button class="nav-btn active" data-view="citas"><span class="ico">&#128197;</span> Gestión de citas</button>
+    <button class="nav-btn" data-view="inbox"><span class="ico">&#128172;</span> Bandeja unificada</button>
+    <button class="nav-btn" data-view="leads"><span class="ico">&#127919;</span> Leads y conversión</button>
+    <button class="nav-btn" data-view="dash"><span class="ico">&#128200;</span> Indicadores</button>
+    <div class="sidebar-user" id="sidebar-user"></div>
+    <div class="sidebar-foot">Prototipo — Concurso Reto Empresarial · Universidad Autónoma del Caribe</div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ================= GESTIÓN DE CITAS ================= -->
+    <section class="view active" id="view-citas">
+      <div class="page-head">
+        <div>
+          <h1>Gestión de citas</h1>
+          <p>Todas las citas en un solo lugar, sin importar por dónde llegaron: portal web, WhatsApp, Doctoralia, chatbot o llamada. Las citas que los pacientes crean o modifican desde la página aparecen aquí al instante.</p>
+        </div>
+        <span class="badge-demo">CONECTADO AL PORTAL</span>
+      </div>
+      <div class="agenda-toolbar">
+        <select id="filtro-estado" onchange="pintarCitas()">
+          <option value="">Todos los estados</option>
+          <option value="solicitada">Solicitadas (pendientes)</option>
+          <option value="confirmada">Confirmadas</option>
+          <option value="cancelada">Canceladas</option>
+          <option value="atendida">Atendidas</option>
+        </select>
+        <button class="btn primary" onclick="toast('Recordatorios de 24 h enviados automáticamente por WhatsApp a las citas confirmadas de mañana')">&#128276; Enviar recordatorios</button>
+        <button class="btn" onclick="pintarCitas(); toast('Agenda actualizada')">&#8635; Actualizar</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Fecha y hora</th><th>Paciente</th><th>Servicio / Especialista</th><th>Origen</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="citas-body"></tbody>
+        </table>
+      </div>
+      <div class="insight">
+        <strong>&#128161; Cómo probar la integración</strong>
+        Abre la página pública (<b>index.html</b>) en otra pestaña, agenda una cita como paciente y vuelve aquí: pulsa "Actualizar" y la verás en estado <b>Solicitada</b>, lista para confirmar. Es la demostración de la agenda centralizada como única fuente de verdad.
+      </div>
+    </section>
+
+    <!-- ================= BANDEJA ================= -->
+    <section class="view" id="view-inbox">
+      <div class="page-head">
+        <div>
+          <h1>Bandeja unificada</h1>
+          <p>Todos los canales (WhatsApp, Instagram, Doctoralia y llamadas) en una sola pantalla. La IA clasifica la intención de cada mensaje y el chatbot responde consultas frecuentes 24/7.</p>
+        </div>
+        <span class="badge-demo">DATOS SIMULADOS</span>
+      </div>
+      <div class="card inbox">
+        <div class="threads" id="threads"></div>
+        <div class="convo">
+          <div class="convo-head">
+            <div>
+              <div class="who" id="convo-who">—</div>
+              <div class="meta" id="convo-meta">—</div>
+            </div>
+            <span id="convo-chip"></span>
+          </div>
+          <div class="msgs" id="msgs"></div>
+          <div class="convo-actions">
+            <button class="btn primary" onclick="toast('Cita creada en la agenda centralizada y confirmación enviada por WhatsApp')">&#128197; Agendar cita</button>
+            <button class="btn" onclick="toast('Contacto registrado en el módulo de leads para seguimiento en 48 h')">&#127919; Registrar como lead</button>
+            <button class="btn" onclick="toast('Conversación transferida a un asesor humano')">&#128100; Pasar a humano</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= LEADS ================= -->
+    <section class="view" id="view-leads">
+      <div class="page-head">
+        <div>
+          <h1>Leads y conversión</h1>
+          <p>Personas que pidieron información pero no agendaron. El sistema registra el motivo de abandono y programa el recontacto automático para recuperarlas.</p>
+        </div>
+        <span class="badge-demo">DATOS SIMULADOS</span>
+      </div>
+      <div class="funnel">
+        <div class="card stage"><div class="n">312</div><div class="t">Contactos del mes</div><div class="pct">100 %</div></div>
+        <div class="card stage"><div class="n">247</div><div class="t">Interesados</div><div class="pct">79 %</div></div>
+        <div class="card stage"><div class="n">176</div><div class="t">Agendaron</div><div class="pct">56 %</div></div>
+        <div class="card stage"><div class="n">158</div><div class="t">Atendidos</div><div class="pct">51 %</div></div>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Persona</th><th>Canal</th><th>Servicio de interés</th><th>Motivo de abandono</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="leads-body"></tbody>
+        </table>
+      </div>
+      <div class="insight">
+        <strong>&#128161; Hallazgo del análisis de abandono</strong>
+        El 38 % de los leads perdidos abandona por demora en la autorización de su EPS y el 27 % por no encontrar horario en la franja de la tarde. Recomendación: habilitar franja de 4–6 pm los martes y jueves, y crear guía automatizada del trámite de autorización.
+      </div>
+    </section>
+
+    <!-- ================= DASHBOARD ================= -->
+    <section class="view" id="view-dash">
+      <div class="page-head">
+        <div>
+          <h1>Indicadores para la toma de decisiones</h1>
+          <p>KPIs en tiempo real del proceso de agendamiento: ocupación, cancelaciones, ausentismo, conversión y tiempos de respuesta por canal.</p>
+        </div>
+        <span class="badge-demo">DATOS SIMULADOS</span>
+      </div>
+      <div class="grid kpis">
+        <div class="card kpi"><div class="lbl">Ocupación de agendas</div><div class="val">82 %</div><span class="trend up">▲ +14 pts vs. mes anterior</span></div>
+        <div class="card kpi"><div class="lbl">Tiempo medio de respuesta</div><div class="val">4 min</div><span class="trend up">▼ antes: 3,2 horas</span></div>
+        <div class="card kpi"><div class="lbl">Ausentismo (no-show)</div><div class="val">7 %</div><span class="trend up">▼ antes: 15 %</span></div>
+        <div class="card kpi"><div class="lbl">Conversión de leads</div><div class="val">56 %</div><span class="trend up">▲ +19 pts con recontacto</span></div>
+      </div>
+      <div class="grid charts">
+        <div class="card chart-card">
+          <h3>Citas por canal de origen (este mes)</h3>
+          <div class="bars">
+            <div class="bar-row"><span>WhatsApp</span><div class="bar-track"><div class="bar-fill" style="width:78%;background:var(--green)"></div></div><span class="bar-val">142</span></div>
+            <div class="bar-row"><span>Portal web</span><div class="bar-track"><div class="bar-fill" style="width:60%;background:var(--teal)"></div></div><span class="bar-val">110</span></div>
+            <div class="bar-row"><span>Chatbot IA</span><div class="bar-track"><div class="bar-fill" style="width:52%;background:var(--brand)"></div></div><span class="bar-val">95</span></div>
+            <div class="bar-row"><span>Doctoralia</span><div class="bar-track"><div class="bar-fill" style="width:38%;background:var(--blue)"></div></div><span class="bar-val">69</span></div>
+            <div class="bar-row"><span>Llamadas</span><div class="bar-track"><div class="bar-fill" style="width:26%;background:var(--amber)"></div></div><span class="bar-val">47</span></div>
+            <div class="bar-row"><span>Instagram</span><div class="bar-track"><div class="bar-fill" style="width:17%;background:var(--rose)"></div></div><span class="bar-val">31</span></div>
+          </div>
+        </div>
+        <div class="card chart-card">
+          <h3>Ocupación semanal por especialidad (%)</h3>
+          <div class="cols">
+            <div class="col"><span class="cv">91</span><div class="stick" style="height:91%"></div><span class="cl">Ginecología</span></div>
+            <div class="col"><span class="cv">86</span><div class="stick" style="height:86%"></div><span class="cl">Perinatología</span></div>
+            <div class="col"><span class="cv">74</span><div class="stick" style="height:74%"></div><span class="cl">Pediatría</span></div>
+            <div class="col"><span class="cv">68</span><div class="stick" style="height:68%"></div><span class="cl">Ecografías</span></div>
+            <div class="col"><span class="cv">55</span><div class="stick" style="height:55%"></div><span class="cl">Nutrición</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="insight">
+        <strong>&#129302; Recomendación de la analítica predictiva</strong>
+        Los lunes entre 8 y 10 am concentran el 34 % del ausentismo. El modelo sugiere confirmación proactiva por WhatsApp el domingo y sobre-agenda controlada de 1 cupo por franja. Nutrición tiene 45 % de capacidad ociosa: oportunidad de promoción cruzada con los controles prenatales.
+      </div>
+    </section>
+
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="assets/store.js"></script>
+<script>
+/* ---------- Guardia de rol ---------- */
+const user = SIBELA.usuario();
+if (!user || user.rol !== 'admin') { location.href = 'login.html'; }
+document.getElementById('sidebar-user').innerHTML =
+  `&#128100; <b>${user ? user.nombre : ''}</b><br>Rol: Administrativo<br><a href="#" onclick="SIBELA.logout(); location.href='index.html'; return false;">Cerrar sesión</a>`;
+
+/* ---------- Navegación ---------- */
+const views = document.querySelectorAll('.view');
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    views.forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + btn.dataset.view).classList.add('active');
+  });
+});
+
+function toast(text) {
+  const t = document.getElementById('toast');
+  t.textContent = text;
+  t.classList.add('show');
+  clearTimeout(t._h);
+  t._h = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ---------- Gestión de citas (conectada al portal) ---------- */
+const ORIGEN_CHIP = { 'Portal web': 'web', 'WhatsApp': 'wa', 'Instagram': 'ig', 'Doctoralia': 'doc', 'Llamada': 'tel', 'Chatbot IA': 'bot' };
+
+function pintarCitas() {
+  const filtro = document.getElementById('filtro-estado').value;
+  const list = SIBELA.citas()
+    .filter(c => !filtro || c.estado === filtro)
+    .sort((a, b) => (a.fecha + a.hora).localeCompare(b.fecha + b.hora));
+  document.getElementById('citas-body').innerHTML = list.length === 0
+    ? '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">No hay citas con ese filtro.</td></tr>'
+    : list.map(c => {
+      const s = SIBELA.servicioDe(c.servicio), m = SIBELA.medicoDe(c.medico);
+      const chip = ORIGEN_CHIP[c.origen] || 'web';
+      return `<tr>
+        <td style="font-weight:600">${SIBELA.fechaBonita(c.fecha)}<br><span style="color:var(--muted);font-weight:400">${c.hora}</span></td>
+        <td>${c.paciente}<br><span style="color:var(--muted)">${c.telefono}</span></td>
+        <td>${s.icono} ${s.nombre}<br><span style="color:var(--muted)">${m.nombre}</span></td>
+        <td><span class="chip ${chip}">${c.origen}</span></td>
+        <td><span class="estado ${c.estado}">${c.estado === 'solicitada' ? 'Pendiente' : c.estado.charAt(0).toUpperCase() + c.estado.slice(1)}</span></td>
+        <td>
+          ${c.estado === 'solicitada' ? `<button class="btn small primary" onclick="accion('${c.id}','confirmada','Cita confirmada. Notificación enviada por WhatsApp a ${c.paciente}.')">Confirmar</button>` : ''}
+          ${c.estado === 'confirmada' ? `<button class="btn small" onclick="accion('${c.id}','atendida','Cita marcada como atendida. Se envió la encuesta de satisfacción.')">Atendida</button>` : ''}
+          ${c.estado !== 'cancelada' && c.estado !== 'atendida' ? `<button class="btn small danger" onclick="accion('${c.id}','cancelada','Cita cancelada. El cupo quedó libre y se notificó al paciente.')">Cancelar</button>` : ''}
+        </td>
+      </tr>`;
+    }).join('');
+}
+
+function accion(id, estado, msg) {
+  SIBELA.cambiarEstado(id, estado);
+  toast(msg);
+  pintarCitas();
+}
+pintarCitas();
+
+/* ---------- Datos simulados: bandeja ---------- */
+const CH = {
+  wa:  { label: 'WhatsApp',   cls: 'wa'  },
+  ig:  { label: 'Instagram',  cls: 'ig'  },
+  doc: { label: 'Doctoralia', cls: 'doc' },
+  tel: { label: 'Llamada',    cls: 'tel' },
+};
+const conversations = [
+  {
+    who: 'María Fernanda Torres', ch: 'wa', when: '10:42', intent: 'Agendar cita',
+    preview: 'Buenos días, ¿tienen disponibilidad con la perinatóloga esta semana?',
+    meta: 'Paciente registrada · Último control: 12 jun · Semana 28 de gestación',
+    msgs: [
+      { t: 'in',  who: 'Paciente', text: 'Buenos días, ¿tienen disponibilidad con la perinatóloga esta semana?' },
+      { t: 'bot', who: 'Chatbot IA', text: '¡Hola, María Fernanda! 😊 La Dra. Herrera tiene disponibilidad el miércoles a las 9:00 am y el viernes a las 10:30 am. ¿Cuál prefieres?' },
+      { t: 'in',  who: 'Paciente', text: 'El miércoles a las 9 me sirve perfecto' },
+      { t: 'bot', who: 'Chatbot IA', text: '¡Listo! Tu cita quedó agendada: miércoles 2 de julio, 9:00 am, Dra. Herrera (Perinatología). Te enviaré un recordatorio 24 horas antes. 📅' },
+    ],
+  },
+  {
+    who: 'Carolina Pérez', ch: 'ig', when: '10:15', intent: 'Pide información',
+    preview: '¿Cuánto cuesta la ecografía 4D? ¿Atienden con Sura?',
+    meta: 'Contacto nuevo · Sin historial · Origen: publicación de Instagram',
+    msgs: [
+      { t: 'in',  who: 'Interesada', text: '¿Cuánto cuesta la ecografía 4D? ¿Atienden con Sura?' },
+      { t: 'bot', who: 'Chatbot IA', text: '¡Hola! 💜 La ecografía 4D tiene un valor de $250.000 particular. Sí atendemos con Sura: necesitas la orden médica y la autorización de tu EPS. ¿Quieres que te guíe con el paso a paso de la autorización?' },
+      { t: 'in',  who: 'Interesada', text: 'Uy, déjame averiguar lo de la autorización y te escribo' },
+      { t: 'bot', who: 'Chatbot IA', text: '¡Claro que sí! Te guardo la información. Si no me escribes, te contacto en un par de días por si necesitas ayuda con el trámite. 🤗' },
+    ],
+  },
+  {
+    who: 'Laura Jiménez', ch: 'doc', when: '9:58', intent: 'Reprogramar',
+    preview: 'Necesito mover mi cita del jueves, me salió un viaje de trabajo…',
+    meta: 'Paciente registrada · Cita actual: jue 3 jul, 11:00 am · Ginecología',
+    msgs: [
+      { t: 'in',  who: 'Paciente', text: 'Necesito mover mi cita del jueves, me salió un viaje de trabajo. ¿Qué opciones hay la otra semana?' },
+      { t: 'out', who: 'Recepción', text: 'Hola Laura, con gusto. La Dra. Acosta tiene disponible el martes 8 a las 2:30 pm o el miércoles 9 a las 8:00 am. El cupo del jueves quedará libre para otra paciente en lista de espera.' },
+      { t: 'in',  who: 'Paciente', text: 'El martes a las 2:30 está perfecto, gracias!' },
+    ],
+  },
+  {
+    who: 'Andrea Salcedo', ch: 'tel', when: '9:30', intent: 'Pide información',
+    preview: 'Llamada registrada: preguntó por control prenatal, quedó de volver a llamar',
+    meta: 'Contacto nuevo · Llamada de 3 min registrada por recepción',
+    msgs: [
+      { t: 'out', who: 'Recepción (nota de llamada)', text: 'Preguntó por el control prenatal y los precios del paquete. Está en semana 9. Quedó de consultar con su esposo y volver a llamar. Registrada como lead con recontacto en 48 h.' },
+    ],
+  },
+  {
+    who: 'Paola Martínez', ch: 'wa', when: 'Ayer', intent: 'Cancelar',
+    preview: 'Hola, debo cancelar mi cita de mañana, ¿la puedo dejar para otro día?',
+    meta: 'Paciente registrada · Cita: mié 2 jul, 10:00 am · Pediatría',
+    msgs: [
+      { t: 'in',  who: 'Paciente', text: 'Hola, debo cancelar mi cita de mañana, ¿la puedo dejar para otro día?' },
+      { t: 'bot', who: 'Chatbot IA', text: 'Hola Paola, lamento el inconveniente. Tu cita del miércoles queda cancelada y el cupo se liberó. El Dr. Ruiz tiene disponibilidad el viernes 4 a las 10:00 am, ¿te la reservo?' },
+      { t: 'in',  who: 'Paciente', text: 'Sí por favor 🙏' },
+      { t: 'bot', who: 'Chatbot IA', text: '¡Reservada! Viernes 4 de julio, 10:00 am con el Dr. Ruiz (Pediatría). El cupo del miércoles ya fue ofrecido a la lista de espera. ✅' },
+    ],
+  },
+];
+
+const threadsEl = document.getElementById('threads');
+conversations.forEach((c, i) => {
+  const d = document.createElement('div');
+  d.className = 'thread' + (i === 0 ? ' sel' : '');
+  d.innerHTML = `
+    <div class="row1"><span class="who">${c.who}</span><span class="when">${c.when}</span></div>
+    <div class="preview">${c.preview}</div>
+    <div class="row3"><span class="chip ${CH[c.ch].cls}">${CH[c.ch].label}</span><span class="intent">IA: ${c.intent}</span></div>`;
+  d.addEventListener('click', () => selectThread(i));
+  threadsEl.appendChild(d);
+});
+
+function selectThread(i) {
+  document.querySelectorAll('.thread').forEach((t, j) => t.classList.toggle('sel', j === i));
+  const c = conversations[i];
+  document.getElementById('convo-who').textContent = c.who;
+  document.getElementById('convo-meta').textContent = c.meta;
+  document.getElementById('convo-chip').innerHTML = `<span class="chip ${CH[c.ch].cls}">${CH[c.ch].label}</span>`;
+  const box = document.getElementById('msgs');
+  box.innerHTML = '';
+  c.msgs.forEach(m => {
+    const el = document.createElement('div');
+    el.className = 'msg ' + m.t;
+    el.innerHTML = `<span class="tag">${m.who}</span>${m.text}`;
+    box.appendChild(el);
+  });
+}
+selectThread(0);
+
+/* ---------- Datos simulados: leads ---------- */
+const leads = [
+  { who: 'Carolina Pérez', ch: 'ig', srv: 'Ecografía 4D', why: 'Trámite de autorización EPS', st: 'pendiente' },
+  { who: 'Andrea Salcedo', ch: 'tel', srv: 'Control prenatal', why: 'Consultará con su familia', st: 'pendiente' },
+  { who: 'Yulieth Camargo', ch: 'wa', srv: 'Perinatología', why: 'Sin horario en la tarde', st: 'contactado' },
+  { who: 'Melissa Ortega', ch: 'wa', srv: 'Ginecología', why: 'Preguntó precio y no respondió', st: 'recuperado' },
+  { who: 'Tatiana Beltrán', ch: 'doc', srv: 'Pediatría', why: 'Eligió otra IPS más cercana', st: 'perdido' },
+  { who: 'Karen Sofía Díaz', ch: 'ig', srv: 'Ecografía de detalle', why: 'Trámite de autorización EPS', st: 'contactado' },
+];
+const stLabel = { pendiente: 'Recontacto en 48 h', contactado: 'Recontactada', recuperado: 'Recuperada ✓', perdido: 'No interesada' };
+document.getElementById('leads-body').innerHTML = leads.map(l => `
+  <tr>
+    <td style="font-weight:600">${l.who}</td>
+    <td><span class="chip ${CH[l.ch].cls}">${CH[l.ch].label}</span></td>
+    <td>${l.srv}</td>
+    <td style="color:var(--muted)">${l.why}</td>
+    <td><span class="lead-estado ${l.st}">${stLabel[l.st]}</span></td>
+    <td><button class="btn small" onclick="toast('Mensaje de seguimiento personalizado enviado a ${l.who}')">Recontactar</button></td>
+  </tr>`).join('');
+</script>
+</body>
+</html>

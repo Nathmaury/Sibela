@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ingreso — Sibela</title>
+<style>
+  :root {
+    --ink: #2a2038; --muted: #6b6480; --brand: #7c3aed; --brand-dark: #5b21b6;
+    --brand-soft: #f3efff; --pink: #db2777; --border: #ece7f4;
+    --radius: 18px; --shadow: 0 2px 6px rgba(60,30,110,.06), 0 12px 32px rgba(60,30,110,.1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", system-ui, sans-serif; color: var(--ink);
+    min-height: 100vh; display: grid; place-items: center; padding: 24px;
+    background: linear-gradient(135deg, #f6f2ff, #fdf2f8);
+  }
+  .box { width: 100%; max-width: 420px; }
+  .logo { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 22px; text-decoration: none; color: var(--ink); }
+  .logo-mark {
+    width: 44px; height: 44px; border-radius: 13px;
+    background: linear-gradient(135deg, var(--brand), var(--pink));
+    display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 20px;
+  }
+  .logo b { display: block; font-size: 16px; line-height: 1.1; }
+  .logo small { font-size: 10px; color: var(--muted); letter-spacing: .6px; }
+  .card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 30px; }
+  h1 { font-size: 20px; text-align: center; }
+  p.sub { text-align: center; color: var(--muted); font-size: 13px; margin: 8px 0 22px; }
+
+  .tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--brand-soft); border-radius: 12px; padding: 4px; margin-bottom: 22px; }
+  .tabs button {
+    font: inherit; font-size: 13px; font-weight: 700; padding: 9px; border: none;
+    border-radius: 9px; background: transparent; color: var(--muted); cursor: pointer;
+  }
+  .tabs button.on { background: #fff; color: var(--brand-dark); box-shadow: 0 1px 4px rgba(60,30,110,.12); }
+
+  label { display: block; font-size: 12.5px; font-weight: 700; margin: 14px 0 6px; }
+  input {
+    width: 100%; font: inherit; font-size: 14px; padding: 11px 14px;
+    border: 1.5px solid var(--border); border-radius: 11px; outline: none;
+  }
+  input:focus { border-color: var(--brand); }
+  .btn {
+    width: 100%; margin-top: 22px; font: inherit; font-size: 14.5px; font-weight: 700;
+    padding: 13px; border: none; border-radius: 12px; cursor: pointer;
+    background: var(--brand); color: #fff; transition: filter .12s;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .hint {
+    margin-top: 16px; background: #fef3c7; color: #92400e; border-radius: 11px;
+    font-size: 12px; padding: 10px 14px; line-height: 1.5;
+  }
+  .back { display: block; text-align: center; margin-top: 18px; font-size: 13px; color: var(--brand); font-weight: 700; text-decoration: none; }
+  .err { color: #e11d48; font-size: 12.5px; font-weight: 600; margin-top: 10px; display: none; }
+</style>
+</head>
+<body>
+<div class="box">
+  <a class="logo" href="index.html">
+    <div class="logo-mark">S</div>
+    <div><b>Sibela</b><small>MEDICINA MATERNO FETAL</small></div>
+  </a>
+  <div class="card">
+    <h1>Bienvenido</h1>
+    <p class="sub">Ingresa según tu perfil</p>
+
+    <div class="tabs">
+      <button id="tab-pac" class="on" onclick="setRol('paciente')">Soy paciente</button>
+      <button id="tab-adm" onclick="setRol('admin')">Soy funcionario</button>
+    </div>
+
+    <form onsubmit="return entrar(event)">
+      <div id="f-paciente">
+        <label>Nombre completo</label>
+        <input id="p-nombre" placeholder="Ej: María Fernanda Torres">
+        <label>Celular (con el que agendaste)</label>
+        <input id="p-tel" placeholder="Ej: 3001112233" inputmode="numeric">
+      </div>
+      <div id="f-admin" style="display:none">
+        <label>Usuario institucional</label>
+        <input id="a-user" placeholder="Ej: recepcion1">
+        <label>Contraseña</label>
+        <input id="a-pass" type="password" placeholder="••••••••">
+      </div>
+      <div class="err" id="err"></div>
+      <button class="btn" type="submit" id="btn-entrar">Ingresar</button>
+    </form>
+
+    <div class="hint" id="hint">
+      <b>Demo:</b> como paciente puedes entrar con cualquier nombre y celular. Prueba con el celular <b>3001112233</b> (María Fernanda) para ver citas ya creadas.
+    </div>
+  </div>
+  <a class="back" href="index.html">← Volver a la página principal</a>
+</div>
+
+<script src="assets/store.js"></script>
+<script>
+  let rol = 'paciente';
+
+  function setRol(r) {
+    rol = r;
+    document.getElementById('tab-pac').classList.toggle('on', r === 'paciente');
+    document.getElementById('tab-adm').classList.toggle('on', r === 'admin');
+    document.getElementById('f-paciente').style.display = r === 'paciente' ? '' : 'none';
+    document.getElementById('f-admin').style.display = r === 'admin' ? '' : 'none';
+    document.getElementById('hint').innerHTML = r === 'admin'
+      ? '<b>Demo:</b> usuario <b>admin</b> y contraseña <b>sibela2026</b>. En una implementación real esto se conecta al directorio de usuarios de la IPS con roles y permisos.'
+      : '<b>Demo:</b> como paciente puedes entrar con cualquier nombre y celular. Prueba con el celular <b>3001112233</b> (María Fernanda) para ver citas ya creadas.';
+    err('');
+  }
+
+  function err(msg) {
+    const e = document.getElementById('err');
+    e.textContent = msg; e.style.display = msg ? 'block' : 'none';
+  }
+
+  function entrar(ev) {
+    ev.preventDefault();
+    if (rol === 'paciente') {
+      const nombre = document.getElementById('p-nombre').value.trim();
+      const tel = document.getElementById('p-tel').value.trim();
+      if (!nombre || !tel) { err('Escribe tu nombre y tu celular para continuar.'); return false; }
+      SIBELA.login({ rol: 'paciente', nombre, telefono: tel });
+      location.href = 'portal.html';
+    } else {
+      const u = document.getElementById('a-user').value.trim();
+      const p = document.getElementById('a-pass').value;
+      if (u === 'admin' && p === 'sibela2026') {
+        SIBELA.login({ rol: 'admin', nombre: 'Funcionario Sibela', usuario: u });
+        location.href = 'admin.html';
+      } else {
+        err('Usuario o contraseña incorrectos. (Demo: admin / sibela2026)');
+      }
+    }
+    return false;
+  }
+</script>
+</body>
+</html>

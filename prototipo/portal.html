@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis citas — Sibela</title>
+<style>
+  :root {
+    --ink: #2a2038; --muted: #6b6480; --brand: #7c3aed; --brand-dark: #5b21b6;
+    --brand-soft: #f3efff; --pink: #db2777; --pink-soft: #fdf2f8;
+    --green: #16a34a; --green-soft: #dcfce7; --amber: #d97706; --amber-soft: #fef3c7;
+    --rose: #e11d48; --rose-soft: #ffe4e6; --border: #ece7f4; --cream: #fdfbf7;
+    --radius: 16px; --shadow: 0 2px 6px rgba(60,30,110,.06), 0 10px 28px rgba(60,30,110,.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; color: var(--ink); background: var(--cream); min-height: 100vh; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+
+  header { background: rgba(253,251,247,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 30; }
+  .nav { display: flex; align-items: center; gap: 14px; padding: 13px 0; }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+  .logo-mark { width: 38px; height: 38px; border-radius: 11px; background: linear-gradient(135deg, var(--brand), var(--pink)); display: grid; place-items: center; color: #fff; font-weight: 800; }
+  .logo b { display: block; font-size: 14px; line-height: 1.1; }
+  .logo small { font-size: 9.5px; color: var(--muted); letter-spacing: .5px; }
+  .who { margin-left: auto; font-size: 13px; color: var(--muted); }
+  .who b { color: var(--ink); }
+  .salir { font-size: 12.5px; font-weight: 700; color: var(--rose); text-decoration: none; }
+
+  h1 { font-size: 24px; margin: 30px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+
+  .card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+
+  /* Wizard de agendamiento */
+  .steps { display: flex; gap: 8px; margin-bottom: 18px; }
+  .step {
+    flex: 1; text-align: center; font-size: 11.5px; font-weight: 700; color: var(--muted);
+    padding: 8px 4px; border-radius: 10px; background: #fff; border: 1.5px solid var(--border);
+  }
+  .step.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .step.done { background: var(--brand-soft); border-color: var(--brand-soft); color: var(--brand-dark); }
+
+  .panel { padding: 24px; }
+  .panel h2 { font-size: 16px; margin-bottom: 16px; }
+  .opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .opt {
+    border: 1.5px solid var(--border); border-radius: 13px; padding: 14px 12px; cursor: pointer;
+    text-align: center; transition: border-color .12s, background .12s; background: #fff;
+    font: inherit;
+  }
+  .opt:hover { border-color: var(--brand); }
+  .opt.sel { border-color: var(--brand); background: var(--brand-soft); }
+  .opt .ico { font-size: 26px; }
+  .opt b { display: block; font-size: 13px; margin-top: 6px; }
+  .opt span { font-size: 11px; color: var(--muted); }
+
+  input[type="date"], input[type="text"], input[type="tel"] {
+    font: inherit; font-size: 14px; padding: 11px 14px; border: 1.5px solid var(--border);
+    border-radius: 11px; outline: none; width: 100%;
+  }
+  input:focus { border-color: var(--brand); }
+  label { display: block; font-size: 12.5px; font-weight: 700; margin: 14px 0 6px; }
+
+  .acciones { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; }
+  .btn {
+    font: inherit; font-size: 13.5px; font-weight: 700; padding: 11px 20px;
+    border-radius: 11px; cursor: pointer; border: 1.5px solid var(--border); background: #fff; color: var(--ink);
+  }
+  .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .btn.primary:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.small { padding: 7px 13px; font-size: 12px; }
+  .btn.danger { color: var(--rose); border-color: #fecdd3; }
+
+  .ok-box { text-align: center; padding: 40px 24px; }
+  .ok-box .big { font-size: 56px; }
+  .ok-box h2 { margin: 12px 0 8px; }
+  .ok-box p { color: var(--muted); font-size: 14px; max-width: 420px; margin: 0 auto 20px; }
+
+  /* Mis citas */
+  .cita {
+    display: flex; align-items: center; gap: 16px; padding: 16px 20px;
+    border-bottom: 1px solid #f4f0fa; flex-wrap: wrap;
+  }
+  .cita:last-child { border-bottom: none; }
+  .cita .fecha {
+    background: var(--brand-soft); color: var(--brand-dark); border-radius: 12px;
+    padding: 10px 14px; text-align: center; min-width: 86px;
+  }
+  .cita .fecha b { display: block; font-size: 13px; }
+  .cita .fecha span { font-size: 11.5px; }
+  .cita .info { flex: 1; min-width: 180px; }
+  .cita .info b { display: block; font-size: 14.5px; }
+  .cita .info span { font-size: 12.5px; color: var(--muted); }
+  .estado { font-size: 11px; font-weight: 700; padding: 4px 11px; border-radius: 99px; }
+  .estado.confirmada { background: var(--green-soft); color: var(--green); }
+  .estado.solicitada { background: var(--amber-soft); color: var(--amber); }
+  .estado.cancelada { background: var(--rose-soft); color: var(--rose); }
+  .cita .ops { display: flex; gap: 8px; }
+  .vacio { padding: 34px; text-align: center; color: var(--muted); font-size: 14px; }
+
+  .aviso {
+    margin: 20px 0 40px; background: var(--pink-soft); border: 1px solid #fbcfe8;
+    border-radius: var(--radius); padding: 14px 18px; font-size: 12.5px; color: #9d174d; line-height: 1.55;
+  }
+
+  /* Modal reagendar */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(42,32,56,.45); z-index: 60;
+    display: none; place-items: center; padding: 20px;
+  }
+  .overlay.show { display: grid; }
+  .modal { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); max-width: 460px; width: 100%; padding: 26px; }
+  .modal h2 { font-size: 17px; margin-bottom: 4px; }
+  .modal p.m { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+
+  .toast {
+    position: fixed; bottom: 22px; right: 22px; background: #2a2038; color: #fff;
+    padding: 13px 18px; border-radius: 12px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0,0,0,.25); opacity: 0; transform: translateY(8px);
+    transition: opacity .2s, transform .2s; pointer-events: none; z-index: 80; max-width: 340px;
+  }
+  .toast.show { opacity: 1; transform: none; }
+  @media (max-width: 620px) { .acciones { flex-direction: column; } .cita .ops { width: 100%; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="index.html">
+      <div class="logo-mark">S</div>
+      <div><b>Sibela</b><small>MEDICINA MATERNO FETAL</small></div>
+    </a>
+    <span class="who" id="who"></span>
+    <a class="salir" href="#" onclick="salir(event)">Salir</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <h1>Agendar una cita</h1>
+  <p class="sub">Elige el servicio, el especialista y el horario. Recibirás la confirmación por WhatsApp.</p>
+
+  <div class="steps">
+    <div class="step on" id="st1">1 · Servicio</div>
+    <div class="step" id="st2">2 · Especialista</div>
+    <div class="step" id="st3">3 · Fecha y hora</div>
+    <div class="step" id="st4">4 · Confirmar</div>
+  </div>
+
+  <div class="card">
+    <!-- Paso 1 -->
+    <div class="panel" id="p1">
+      <h2>¿Qué servicio necesitas?</h2>
+      <div class="opts" id="opts-servicio"></div>
+      <div class="acciones"><span></span><button class="btn primary" id="n1" disabled onclick="irPaso(2)">Continuar →</button></div>
+    </div>
+
+    <!-- Paso 2 -->
+    <div class="panel" id="p2" style="display:none">
+      <h2>Elige tu especialista</h2>
+      <div class="opts" id="opts-medico"></div>
+      <div class="acciones">
+        <button class="btn" onclick="irPaso(1)">← Atrás</button>
+        <button class="btn primary" id="n2" disabled onclick="irPaso(3)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- Paso 3 -->
+    <div class="panel" id="p3" style="display:none">
+      <h2>¿Cuándo te queda bien?</h2>
+      <label>Fecha</label>
+      <input type="date" id="fecha" onchange="cargarHoras()">
+      <label>Horarios disponibles</label>
+      <div class="opts" id="opts-hora"><span style="font-size:13px;color:var(--muted)">Elige primero una fecha.</span></div>
+      <div class="acciones">
+        <button class="btn" onclick="irPaso(2)">← Atrás</button>
+        <button class="btn primary" id="n3" disabled onclick="irPaso(4)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- Paso 4 -->
+    <div class="panel" id="p4" style="display:none">
+      <h2>Confirma tus datos</h2>
+      <div id="resumen" style="background:var(--brand-soft);border-radius:13px;padding:16px 18px;font-size:13.5px;line-height:1.8"></div>
+      <label>Tu nombre completo</label>
+      <input type="text" id="nombre" placeholder="Ej: María Fernanda Torres">
+      <label>Tu celular (allí llega la confirmación)</label>
+      <input type="tel" id="telefono" placeholder="Ej: 3001112233">
+      <div class="acciones">
+        <button class="btn" onclick="irPaso(3)">← Atrás</button>
+        <button class="btn primary" onclick="confirmar()">✓ Confirmar cita</button>
+      </div>
+    </div>
+
+    <!-- Éxito -->
+    <div class="ok-box" id="pok" style="display:none">
+      <div class="big">🎉</div>
+      <h2>¡Tu cita quedó solicitada!</h2>
+      <p id="ok-txt"></p>
+      <button class="btn primary" onclick="reset()">Agendar otra cita</button>
+    </div>
+  </div>
+
+  <h1 id="miscitas">Mis citas</h1>
+  <p class="sub">Aquí puedes confirmar tu asistencia, reagendar o cancelar cuando lo necesites.</p>
+  <div class="card" id="lista-citas"></div>
+
+  <div class="aviso">
+    <b>Prototipo con datos simulados.</b> En la implementación real, cada acción genera una notificación automática por WhatsApp y actualiza en tiempo real la agenda del panel administrativo (puedes verlo entrando como funcionario desde <a href="login.html" style="color:inherit">Acceso funcionarios</a>).
+  </div>
+</div>
+
+<!-- Modal reagendar -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2>Reagendar cita</h2>
+    <p class="m" id="re-desc"></p>
+    <label>Nueva fecha</label>
+    <input type="date" id="re-fecha" onchange="cargarHorasRe()">
+    <label>Nuevo horario</label>
+    <div class="opts" id="re-horas"><span style="font-size:13px;color:var(--muted)">Elige primero una fecha.</span></div>
+    <div class="acciones">
+      <button class="btn" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn primary" id="re-ok" disabled onclick="confirmarRe()">Confirmar cambio</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/store.js"></script>
+<script>
+  /* ---------- Sesión ---------- */
+  let user = SIBELA.usuario();
+  if (user && user.rol === 'admin') { location.href = 'admin.html'; }
+  document.getElementById('who').innerHTML = user ? `Hola, <b>${user.nombre.split(' ')[0]}</b>` : '<a href="login.html" style="color:var(--brand);font-weight:700;text-decoration:none">Identifícate para ver tus citas</a>';
+
+  function salir(e) { e.preventDefault(); SIBELA.logout(); location.href = 'index.html'; }
+
+  function toast(t) {
+    const el = document.getElementById('toast');
+    el.textContent = t; el.classList.add('show');
+    clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove('show'), 3200);
+  }
+
+  /* ---------- Wizard ---------- */
+  const sel = { servicio: null, medico: null, fecha: null, hora: null };
+
+  const params = new URLSearchParams(location.search);
+  const preServicio = params.get('servicio');
+
+  function pintarServicios() {
+    document.getElementById('opts-servicio').innerHTML = SIBELA.SERVICIOS.map(s => `
+      <button class="opt ${sel.servicio === s.id ? 'sel' : ''}" onclick="elegirServicio('${s.id}')">
+        <div class="ico">${s.icono}</div><b>${s.nombre}</b>
+      </button>`).join('');
+    document.getElementById('n1').disabled = !sel.servicio;
+  }
+
+  function elegirServicio(id) {
+    sel.servicio = id; sel.medico = null; sel.hora = null;
+    pintarServicios();
+  }
+
+  function pintarMedicos() {
+    const meds = SIBELA.MEDICOS.filter(m => m.servicio === sel.servicio);
+    document.getElementById('opts-medico').innerHTML = meds.map(m => `
+      <button class="opt ${sel.medico === m.id ? 'sel' : ''}" onclick="elegirMedico('${m.id}')">
+        <div class="ico">${SIBELA.servicioDe(m.servicio).icono}</div><b>${m.nombre}</b><span>${m.titulo}</span>
+      </button>`).join('');
+    document.getElementById('n2').disabled = !sel.medico;
+  }
+
+  function elegirMedico(id) { sel.medico = id; sel.hora = null; pintarMedicos(); }
+
+  function cargarHoras() {
+    sel.fecha = document.getElementById('fecha').value; sel.hora = null;
+    const horas = sel.fecha ? SIBELA.horasDisponibles(sel.medico, sel.fecha) : [];
+    document.getElementById('opts-hora').innerHTML = !sel.fecha
+      ? '<span style="font-size:13px;color:var(--muted)">Elige primero una fecha.</span>'
+      : horas.length === 0
+        ? '<span style="font-size:13px;color:var(--muted)">No hay cupos ese día, prueba otra fecha.</span>'
+        : horas.map(h => `<button class="opt" onclick="elegirHora('${h}', this)"><b>${h}</b></button>`).join('');
+    document.getElementById('n3').disabled = true;
+  }
+
+  function elegirHora(h, btn) {
+    sel.hora = h;
+    document.querySelectorAll('#opts-hora .opt').forEach(o => o.classList.remove('sel'));
+    btn.classList.add('sel');
+    document.getElementById('n3').disabled = false;
+  }
+
+  function irPaso(n) {
+    [1,2,3,4].forEach(i => {
+      document.getElementById('p' + i).style.display = i === n ? '' : 'none';
+      const st = document.getElementById('st' + i);
+      st.className = 'step' + (i === n ? ' on' : i < n ? ' done' : '');
+    });
+    document.getElementById('pok').style.display = 'none';
+    if (n === 2) pintarMedicos();
+    if (n === 4) {
+      const s = SIBELA.servicioDe(sel.servicio), m = SIBELA.medicoDe(sel.medico);
+      document.getElementById('resumen').innerHTML =
+        `${s.icono} <b>${s.nombre}</b> con <b>${m.nombre}</b><br>📅 ${SIBELA.fechaBonita(sel.fecha)} · ${sel.hora}<br>📍 Cll. 85 # 50 – 159, Barranquilla`;
+      if (user && user.rol === 'paciente') {
+        document.getElementById('nombre').value = user.nombre;
+        document.getElementById('telefono').value = user.telefono;
+      }
+    }
+  }
+
+  function confirmar() {
+    const nombre = document.getElementById('nombre').value.trim();
+    const tel = document.getElementById('telefono').value.trim();
+    if (!nombre || !tel) { toast('Escribe tu nombre y celular para confirmar.'); return; }
+    if (!user) { user = { rol: 'paciente', nombre, telefono: tel }; SIBELA.login(user); }
+    SIBELA.crearCita({ paciente: nombre, telefono: tel, servicio: sel.servicio, medico: sel.medico, fecha: sel.fecha, hora: sel.hora });
+    [1,2,3,4].forEach(i => document.getElementById('p' + i).style.display = 'none');
+    document.getElementById('pok').style.display = '';
+    document.getElementById('ok-txt').textContent =
+      `Te enviamos la solicitud al equipo de Sibela. Recibirás la confirmación y el recordatorio en el celular ${tel} por WhatsApp.`;
+    document.getElementById('who').innerHTML = `Hola, <b>${nombre.split(' ')[0]}</b>`;
+    pintarCitas();
+  }
+
+  function reset() {
+    sel.servicio = sel.medico = sel.fecha = sel.hora = null;
+    document.getElementById('fecha').value = '';
+    document.getElementById('opts-hora').innerHTML = '<span style="font-size:13px;color:var(--muted)">Elige primero una fecha.</span>';
+    pintarServicios(); irPaso(1);
+  }
+
+  /* ---------- Mis citas ---------- */
+  function pintarCitas() {
+    const box = document.getElementById('lista-citas');
+    if (!user) { box.innerHTML = '<div class="vacio">Identifícate desde <a href="login.html" style="color:var(--brand);font-weight:700">Ingreso</a> con tu celular para ver y gestionar tus citas.</div>'; return; }
+    const list = SIBELA.citasDe(user.telefono);
+    if (list.length === 0) { box.innerHTML = '<div class="vacio">Aún no tienes citas registradas con este celular. ¡Agenda la primera arriba! 💜</div>'; return; }
+    box.innerHTML = list.map(c => {
+      const s = SIBELA.servicioDe(c.servicio), m = SIBELA.medicoDe(c.medico);
+      const activa = c.estado !== 'cancelada';
+      return `
+      <div class="cita">
+        <div class="fecha"><b>${SIBELA.fechaBonita(c.fecha)}</b><span>${c.hora}</span></div>
+        <div class="info">
+          <b>${s.icono} ${s.nombre}</b>
+          <span>${m.nombre} · ${m.titulo}</span>
+        </div>
+        <span class="estado ${c.estado}">${c.estado === 'solicitada' ? 'Pendiente de confirmar' : c.estado.charAt(0).toUpperCase() + c.estado.slice(1)}</span>
+        <div class="ops">
+          ${activa ? `<button class="btn small" onclick="abrirModal('${c.id}')">Reagendar</button>
+          <button class="btn small danger" onclick="cancelar('${c.id}')">Cancelar</button>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function cancelar(id) {
+    SIBELA.cambiarEstado(id, 'cancelada');
+    toast('Cita cancelada. El cupo quedó libre para otra paciente y notificamos a la clínica.');
+    pintarCitas();
+  }
+
+  /* ---------- Reagendar ---------- */
+  let citaRe = null, reHora = null;
+
+  function abrirModal(id) {
+    citaRe = SIBELA.citas().find(c => c.id === id);
+    reHora = null;
+    const s = SIBELA.servicioDe(citaRe.servicio), m = SIBELA.medicoDe(citaRe.medico);
+    document.getElementById('re-desc').textContent = `${s.nombre} con ${m.nombre} — actualmente: ${SIBELA.fechaBonita(citaRe.fecha)}, ${citaRe.hora}.`;
+    document.getElementById('re-fecha').value = '';
+    document.getElementById('re-horas').innerHTML = '<span style="font-size:13px;color:var(--muted)">Elige primero una fecha.</span>';
+    document.getElementById('re-ok').disabled = true;
+    document.getElementById('overlay').classList.add('show');
+  }
+
+  function cargarHorasRe() {
+    const f = document.getElementById('re-fecha').value; reHora = null;
+    const horas = f ? SIBELA.horasDisponibles(citaRe.medico, f) : [];
+    document.getElementById('re-horas').innerHTML = horas.length === 0
+      ? '<span style="font-size:13px;color:var(--muted)">No hay cupos ese día.</span>'
+      : horas.map(h => `<button class="opt" onclick="elegirHoraRe('${h}', this)"><b>${h}</b></button>`).join('');
+    document.getElementById('re-ok').disabled = true;
+  }
+
+  function elegirHoraRe(h, btn) {
+    reHora = h;
+    document.querySelectorAll('#re-horas .opt').forEach(o => o.classList.remove('sel'));
+    btn.classList.add('sel');
+    document.getElementById('re-ok').disabled = false;
+  }
+
+  function confirmarRe() {
+    SIBELA.reagendar(citaRe.id, document.getElementById('re-fecha').value, reHora);
+    cerrarModal();
+    toast('Cita reagendada. Te llegará la nueva confirmación por WhatsApp.');
+    pintarCitas();
+  }
+
+  function cerrarModal() { document.getElementById('overlay').classList.remove('show'); }
+
+  /* ---------- Inicio ---------- */
+  pintarServicios();
+  if (preServicio && SIBELA.servicioDe(preServicio)) { elegirServicio(preServicio); irPaso(2); }
+  pintarCitas();
+  if (location.hash === '#miscitas') document.getElementById('miscitas').scrollIntoView();
+</script>
+</body>
+</html>
