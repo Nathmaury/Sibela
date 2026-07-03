@@ -8,8 +8,7 @@ Proyecto para el **Concurso Reto Empresarial**
 | Carpeta / archivo | Qué es |
 |-------------------|--------|
 | `docs/PROPUESTA.md` | Documento de la propuesta: diagnóstico, oportunidades de mejora, solución, herramientas recomendadas, estrategias de IA y plan de implementación con KPIs. Es la base del entregable que pide el formato del concurso. |
-| `prototipo/index.html` | Prototipo funcional navegable ("Sibela Conecta") con datos simulados. Se abre haciendo doble clic en el archivo (no necesita instalación ni servidor). |
-
+| `prototipo/index.html` | Prototipo funcional navegable ("Sibela Conecta") con datos simulados.
 
 ## Pendientes para completar la entrega
 
