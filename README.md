@@ -11,15 +11,6 @@ Proyecto para el **Concurso Reto Empresarial** de la Universidad Autónoma del C
 | `docs/PROPUESTA.md` | Documento de la propuesta: diagnóstico, oportunidades de mejora, solución, herramientas recomendadas, estrategias de IA y plan de implementación con KPIs. Es la base del entregable que pide el formato del concurso. |
 | `prototipo/index.html` | Prototipo funcional navegable ("Sibela Conecta") con datos simulados. Se abre haciendo doble clic en el archivo (no necesita instalación ni servidor). |
 
-## Cómo ver el prototipo
-
-1. Abrir la carpeta `prototipo/`.
-2. Doble clic en `index.html` — se abre en el navegador.
-3. Navegar por los 4 módulos desde el menú lateral:
-   - **Bandeja unificada:** conversaciones de WhatsApp, Instagram, Doctoralia y llamadas en una sola pantalla, con clasificación de intención por IA y chatbot.
-   - **Agenda centralizada:** vista única de las agendas médicas con estados de cita y origen del agendamiento.
-   - **Leads y conversión:** embudo de conversión y seguimiento a personas que pidieron información pero no agendaron.
-   - **Indicadores:** KPIs de ocupación, ausentismo, tiempos de respuesta y conversión.
 
 ## Pendientes para completar la entrega
 
